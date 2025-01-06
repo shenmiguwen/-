@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵签问道</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+            font-family: "楷体", KaiTi, serif;
+        }
+
+        .temple-background {
+            width: 80%;
+            max-width: 800px;
+            min-height: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .bamboo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .bamboo-tube {
+            width: 60px;
+            height: 200px;
+            background: linear-gradient(90deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .bamboo-tube:hover {
+            transform: scale(1.05);
+        }
+
+        .shaking {
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        .fortune-result {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            color: #333;
+            display: none;
+        }
+
+        .poem {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: #666;
+        }
+
+        button {
+            background: #ffd700;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #ffed4a;
+            transform: scale(1.05);
+        }
+
+        .incense {
+            position: absolute;
+            width: 4px;
+            height: 100px;
+            background: #8b4513;
+            bottom: 20px;
+        }
+
+        .incense::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -3px;
+            width: 10px;
+            height: 10px;
+            background: #ff4500;
+            border-radius: 50%;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px #ff4500; }
+            50% { box-shadow: 0 0 20px #ff4500; }
+        }
+
+        .fortune-god {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZDcwMCIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgMThjLTQuNDEgMC04LTMuNTktOC04czMuNTktOCA4LTggOCAzLjU5IDggOC0zLjU5IDgtOCA4eiIvPjxwYXRoIGZpbGw9IiNmZmQ3MDAiIGQ9Ik0xMiA2Yy0zLjMxIDAtNiAyLjY5LTYgNnMyLjY5IDYgNiA2IDYtMi42OSA2LTYtMi42OS02LTYtNnptMCAxMGMtMi4yMSAwLTQtMS43OS00LTRzMS43OS00IDQtNCA0IDEuNzkgNCA0LTEuNzkgNC00IDR6Ii8+PC9zdmc+');
+            background-size: contain;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fortune-god-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .fortune-god-glow {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0) 70%);
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .horoscope-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .horoscope-title {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .zodiac-select {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #ffd700;
+            border-radius: 5px;
+            margin-right: 1rem;
+            font-family: "楷体", KaiTi, serif;
+        }
+
+        .horoscope-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            display: none;
+        }
+
+        .horoscope-text {
+            color: #333;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .lucky-elements {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            color: #666;
+        }
+
+        .hexagram-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .hexagram-title {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hexagram-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .yao {
+            width: 100px;
+            height: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .yao-line {
+            height: 100%;
+            background: #ffd700;
+            transition: all 0.3s ease;
+        }
+
+        .yao-yin {
+            width: 45%;
+        }
+
+        .yao-yang {
+            width: 100%;
+        }
+
+        .hexagram-result {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .hexagram-meaning {
+            color: #333;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="fortune-god-container">
+        <div class="fortune-god-glow"></div>
+        <img src="https://api.iconify.design/mdi:human-greeting-variant.svg?color=gold" 
+             alt="财神爷" 
+             class="fortune-god" 
+             style="opacity: 0.9;">
+    </div>
+    <div class="temple-background">
+        <h1>灵签问道</h1>
+        <div class="bamboo-container">
+            <div class="bamboo-tube" onclick="shakeBamboo()"></div>
+            <div class="fortune-result">
+                <h2 id="fortune-text"></h2>
+                <p class="poem" id="fortune-poem"></p>
+                <button onclick="reset()">再求一签</button>
+            </div>
+        </div>
+
+        <div class="horoscope-section">
+            <h2 class="horoscope-title">今日星座运势</h2>
+            <select class="zodiac-select" id="zodiacSelect">
+                <option value="">选择星座</option>
+                <option value="aries">白羊座 (3.21-4.19)</option>
+                <option value="taurus">金牛座 (4.20-5.20)</option>
+                <option value="gemini">双子座 (5.21-6.21)</option>
+                <option value="cancer">巨蟹座 (6.22-7.22)</option>
+                <option value="leo">狮子座 (7.23-8.22)</option>
+                <option value="virgo">处女座 (8.23-9.22)</option>
+                <option value="libra">天秤座 (9.23-10.23)</option>
+                <option value="scorpio">天蝎座 (10.24-11.22)</option>
+                <option value="sagittarius">射手座 (11.23-12.21)</option>
+                <option value="capricorn">摩羯座 (12.22-1.19)</option>
+                <option value="aquarius">水瓶座 (1.20-2.18)</option>
+                <option value="pisces">双鱼座 (2.19-3.20)</option>
+            </select>
+            <button onclick="checkHoroscope()">查看运势</button>
+            
+            <div class="horoscope-result" id="horoscopeResult">
+                <p class="horoscope-text" id="horoscopeText"></p>
+                <div class="lucky-elements">
+                    <span id="luckyNumber">幸运数字：</span>
+                    <span id="luckyColor">幸运颜色：</span>
+                    <span id="luckyDirection">幸运方位：</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hexagram-section">
+            <h2 class="hexagram-title">六爻占卦</h2>
+            <button onclick="castHexagram()">抛铜钱占卦</button>
+            
+            <div class="hexagram-display" id="hexagramDisplay">
+                <div class="yao" id="yao6"><div class="yao-line"></div></div>
+                <div class="yao" id="yao5"><div class="yao-line"></div></div>
+                <div class="yao" id="yao4"><div class="yao-line"></div></div>
+                <div class="yao" id="yao3"><div class="yao-line"></div></div>
+                <div class="yao" id="yao2"><div class="yao-line"></div></div>
+                <div class="yao" id="yao1"><div class="yao-line"></div></div>
+            </div>
+            
+            <div class="hexagram-result" id="hexagramResult">
+                <h3 id="hexagramName"></h3>
+                <p class="hexagram-meaning" id="hexagramMeaning"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fortunes = [
+            { text: "上上签：万事顺遂，心想事成", poem: "春风得意马蹄疾，一日看尽长安花" },
+            { text: "上签：吉祥如意，前程似锦", poem: "东风夜放花千树，更吹落、星如雨" },
+            { text: "中签：平安喜乐，渐入佳境", poem: "云淡风轻近午天，傍花随柳过前川" },
+            { text: "下签：暂时困顿，静待花开", poem: "守得云开见月明，终须悟彻是前缘" },
+            { text: "上上签：前途光明，万事如意", poem: "欲把西湖比西子，淡妆浓抹总相宜" },
+            { text: "中签：事事随缘，静观其变", poem: "莫听穿林打叶声，何妨吟啸且徐行" }
+        ];
+
+        const bambooSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wooden-stick-drop-2878.wav');
+        const resultSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.wav');
+
+        function shakeBamboo() {
+            const bambooTube = document.querySelector('.bamboo-tube');
+            const fortuneResult = document.querySelector('.fortune-result');
+            
+            bambooTube.classList.add('shaking');
+            bambooSound.play();
+
+            setTimeout(() => {
+                bambooTube.style.display = 'none';
+                fortuneResult.style.display = 'block';
+                
+                const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+                document.getElementById('fortune-text').textContent = randomFortune.text;
+                document.getElementById('fortune-poem').textContent = randomFortune.poem;
+                
+                resultSound.play();
+            }, 2000);
+        }
+
+        function reset() {
+            const bambooTube = document.querySelector('.bamboo-tube');
+            const fortuneResult = document.querySelector('.fortune-result');
+            
+            bambooTube.style.display = 'block';
+            bambooTube.classList.remove('shaking');
+            fortuneResult.style.display = 'none';
+        }
+
+        function showBlessing() {
+            const fortuneGod = document.querySelector('.fortune-god');
+            fortuneGod.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                fortuneGod.style.transform = 'scale(1)';
+            }, 500);
+        }
+
+        const originalShakeBamboo = shakeBamboo;
+        shakeBamboo = function() {
+            showBlessing();
+            originalShakeBamboo();
+        }
+
+        // 星座运势数据
+        const horoscopeData = {
+            aries: {
+                text: "今日充满活力与创造力，适合开启新项目。人际关系方面会有意外惊喜。",
+                luckyNumber: "3",
+                luckyColor: "红色",
+                luckyDirection: "东"
+            },
+            taurus: {
+                text: "财运亨通，投资理财好时机。感情方面需要多一些耐心和包容。",
+                luckyNumber: "6",
+                luckyColor: "绿色",
+                luckyDirection: "南"
+            },
+            gemini: {
+                text: "思维敏捷，表达能力出众。适合参加社交活动，扩展人脉。",
+                luckyNumber: "7",
+                luckyColor: "黄色",
+                luckyDirection: "西"
+            },
+            // ... 其他星座数据
+        };
+
+        function checkHoroscope() {
+            const select = document.getElementById('zodiacSelect');
+            const result = document.getElementById('horoscopeResult');
+            const zodiac = select.value;
+
+            if (!zodiac) {
+                alert('请选择星座');
+                return;
+            }
+
+            const data = horoscopeData[zodiac] || {
+                text: "运势生成中...",
+                luckyNumber: "8",
+                luckyColor: "金色",
+                luckyDirection: "北"
+            };
+
+            document.getElementById('horoscopeText').textContent = data.text;
+            document.getElementById('luckyNumber').textContent = `幸运数字：${data.luckyNumber}`;
+            document.getElementById('luckyColor').textContent = `幸运颜色：${data.luckyColor}`;
+            document.getElementById('luckyDirection').textContent = `幸运方位：${data.luckyDirection}`;
+
+            result.style.display = 'block';
+            
+            // 添加动画效果
+            result.style.opacity = '0';
+            result.style.transform = 'translateY(20px)';
+            result.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                result.style.opacity = '1';
+                result.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        // 六爻占卦数据
+        const hexagramData = {
+            "111111": {
+                name: "乾卦",
+                meaning: "大吉大利。象征天行健，君子以自强不息。事业发展顺利，万事亨通。"
+            },
+            "000000": {
+                name: "坤卦",
+                meaning: "大地包容，厚德载物。宜守不宜进，静待时机。"
+            },
+            "010101": {
+                name: "既济卦",
+                meaning: "水火既济，物极必反。当前形势大好，但需防物极必反。"
+            },
+            "101010": {
+                name: "未济卦",
+                meaning: "水火未济，待时而动。当前困境未解，需要耐心等待时机。"
+            }
+            // 可以添加更多卦象...
+        };
+
+        function castHexagram() {
+            const coinSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-coins-handling-1939.wav');
+            coinSound.play();
+
+            let hexagram = '';
+            const display = document.getElementById('hexagramDisplay');
+            display.style.opacity = '0.5';
+
+            // 模拟抛铜钱动画
+            setTimeout(() => {
+                for (let i = 1; i <= 6; i++) {
+                    const yao = document.getElementById(`yao${i}`).querySelector('.yao-line');
+                    const isYang = Math.random() < 0.5;
+                    
+                    hexagram = (isYang ? '1' : '0') + hexagram;
+                    
+                    if (isYang) {
+                        yao.className = 'yao-line yao-yang';
+                    } else {
+                        yao.className = 'yao-line yao-yin';
+                    }
+                }
+
+                display.style.opacity = '1';
+                
+                // 显示卦象解释
+                const result = document.getElementById('hexagramResult');
+                const hexagramInfo = hexagramData[hexagram] || {
+                    name: "变卦",
+                    meaning: "此卦象显示变化之象，需要顺应时势而变。"
+                };
+
+                document.getElementById('hexagramName').textContent = hexagramInfo.name;
+                document.getElementById('hexagramMeaning').textContent = hexagramInfo.meaning;
+                
+                result.style.display = 'block';
+                result.style.opacity = '0';
+                result.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    result.style.opacity = '1';
+                    result.style.transform = 'translateY(0)';
+                }, 10);
+
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 
